@@ -2,36 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class InpiApiController extends Controller
 {
-    protected $inpi = 'https://www.tmdn.org/tmview/search-tmv?_search=false&nd=1540562034603&rows=10&page=1&sidx=tm&sord=asc&q=tmsort:%22test%22&fq=[]&pageSize=10&facetQueryType=2&providerList=null&expandedOffices=null&interfacelanguage=en&selectedRowRefNumber=null';
-    protected $json = 'https://jsonplaceholder.typicode.com/todos/1';
 
-    //return view('user.profile', ['user' => User::findOrFail($id)]);
     public function index()
     {
-        echo $this->searchBrand('teste');
+        return response()->json($this->existBrand('teste'));
+    }
+
+    public function existBrand($search)
+    {
+        return substr_count($this->searchBrand($search), 'NCL') > 0;
     }
 
     public function searchBrand($search)
     {
-        $params = array('http' => array('method' => 'POST', 'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0\r\n" . "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n" . "Accept-Language: pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3\r\n" . "Referer: https://gru.inpi.gov.br/pePI/jsp/marcas/Pesquisa_classe_basica.jsp\r\n" . "Content-Type: application/x-www-form-urlencoded\r\n" . "Connection: keep-alive\r\n" . "Cookie: JSESSIONID=E5C2E84295105FA8BD197324DE74408B.tecoa; _ga=GA1.3.1564010215.1540593791\r\n" . "Upgrade-Insecure-Requests: 1", 'content' => 'buscaExata=sim&txt=&marca=' . $search . '&classeInter=&registerPerPage=20&botao=+pesquisar+"%"BB+&Action=searchMarca&tipoPesquisa=BY_MARCA_CLASSIF_BASICA'));
+        $header = [
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0\r\n",
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n",
+            "Accept-Language: pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3\r\n",
+            "Referer: https://gru.inpi.gov.br/pePI/jsp/marcas/Pesquisa_classe_basica.jsp\r\n",
+            "Content-Type: application/x-www-form-urlencoded\r\n",
+            "Connection: keep-alive\r\n",
+            "Cookie: JSESSIONID=66AE38A4D7A86479F0F80C2E97B645E5.tecoa; _ga=GA1.3.1564010215.1540593791; _gid=GA1.3.902493617.1541122458\r\n",
+            "Upgrade-Insecure-Requests: 1"
+        ];
+        $content = [
+            'buscaExata=sim',
+            'txt=',
+            'marca=' . $search,
+            'classeInter=',
+            'registerPerPage=20',
+            'botao=+pesquisar+"%"BB+',
+            'Action=searchMarca',
+            'tipoPesquisa=BY_MARCA_CLASSIF_BASICA'
+        ];
+        return $this->getPage("https://gru.inpi.gov.br/pePI/servlet/MarcasServletController", 'POST', $content, $header);
+    }
 
-        $ctx = stream_context_create($params);
-        $fp = @fopen("https://gru.inpi.gov.br/pePI/servlet/MarcasServletController", 'rb', false, $ctx);
+    private function getPage($url, $method = 'GET', $content = [], $header = [])
+    {
+        $ctx = stream_context_create([
+            'http' => [
+                'method' => $method,
+                'header' => implode('', $header),
+                'content' => implode('&', $content)
+            ]
+        ]);
+        $fp = @fopen($url, 'rb', false, $ctx);
         if (!$fp)
         {
             throw new Exception("Problem with , $php_errormsg");
         }
-
         $response = @stream_get_contents($fp);
         if ($response === false)
         {
             throw new Exception("Problem reading data from $php_errormsg");
         }
-
-        return substr_count($response, 'NCL') > 0;
+        return $response;
     }
 }
