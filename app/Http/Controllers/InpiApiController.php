@@ -15,6 +15,15 @@ class InpiApiController extends Controller
         return substr_count($this->searchBrand($search), 'NCL') > 0;
     }
 
+    public function getJSessionId()
+    {
+        $url = 'https://gru.inpi.gov.br/pePI/servlet/LoginController?action=login';
+        $header = get_headers($url, 1);
+        $cookies = $header['Set-Cookie'];
+        $arrayCookies = explode(';', $cookies);
+        return trim($arrayCookies[0]);
+    }
+
     public function searchBrand($search)
     {
         $header = [
@@ -24,7 +33,7 @@ class InpiApiController extends Controller
             "Referer: https://gru.inpi.gov.br/pePI/jsp/marcas/Pesquisa_classe_basica.jsp\r\n",
             "Content-Type: application/x-www-form-urlencoded\r\n",
             "Connection: keep-alive\r\n",
-            "Cookie: JSESSIONID=66AE38A4D7A86479F0F80C2E97B645E5.tecoa; _ga=GA1.3.1564010215.1540593791; _gid=GA1.3.902493617.1541122458\r\n",
+            "Cookie: " . $this->getJSessionId() . "; _ga=GA1.3.1564010215.1540593791; _gid=GA1.3.902493617.1541122458\r\n",
             "Upgrade-Insecure-Requests: 1"
         ];
         $content = [
@@ -59,6 +68,8 @@ class InpiApiController extends Controller
         {
             throw new Exception("Problem reading data from $php_errormsg");
         }
+        echo $response;
+        die();
         return $response;
     }
 }
