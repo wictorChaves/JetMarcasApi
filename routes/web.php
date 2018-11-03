@@ -14,4 +14,4 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/api', 'InpiApiController@index');
+Route::get('/api/inpi', 'ApisController@inpi');

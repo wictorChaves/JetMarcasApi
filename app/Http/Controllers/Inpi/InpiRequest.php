@@ -1,27 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Inpi;
 
-class InpiApiController extends Controller
+class InpiRequest
 {
-
-    public function index()
-    {
-        return response()->json($this->existBrand('teste'));
-    }
+    use GetContent;
+    use JSessionId;
 
     public function existBrand($search)
     {
         return substr_count($this->searchBrand($search), 'NCL') > 0;
-    }
-
-    public function getJSessionId()
-    {
-        $url = 'https://gru.inpi.gov.br/pePI/servlet/LoginController?action=login';
-        $header = get_headers($url, 1);
-        $cookies = $header['Set-Cookie'];
-        $arrayCookies = explode(';', $cookies);
-        return trim($arrayCookies[0]);
     }
 
     public function searchBrand($search)
@@ -49,27 +37,5 @@ class InpiApiController extends Controller
         return $this->getPage("https://gru.inpi.gov.br/pePI/servlet/MarcasServletController", 'POST', $content, $header);
     }
 
-    private function getPage($url, $method = 'GET', $content = [], $header = [])
-    {
-        $ctx = stream_context_create([
-            'http' => [
-                'method' => $method,
-                'header' => implode('', $header),
-                'content' => implode('&', $content)
-            ]
-        ]);
-        $fp = @fopen($url, 'rb', false, $ctx);
-        if (!$fp)
-        {
-            throw new Exception("Problem with , $php_errormsg");
-        }
-        $response = @stream_get_contents($fp);
-        if ($response === false)
-        {
-            throw new Exception("Problem reading data from $php_errormsg");
-        }
-        echo $response;
-        die();
-        return $response;
-    }
+
 }
