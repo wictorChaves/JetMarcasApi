@@ -20,4 +20,5 @@ Route::get('/api/youtube/{brand}', 'ApisController@youtube')->middleware('cors')
 Route::get('/api/whoapi/{brand}', 'ApisController@whoapi')->middleware('cors');
 Route::get('/api/gmail/{brand}', 'ApisController@gmail')->middleware('cors');
 Route::get('/api/hotmail/{brand}', 'ApisController@hotmail')->middleware('cors');
+Route::get('/api/twitter/{brand}', 'ApisController@twitter')->middleware('cors');
 

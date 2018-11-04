@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\Api;
 use App\Http\Controllers\Api\Emails;
+use App\Http\Controllers\Api\Twitter;
 use App\Http\Controllers\Api\Whoapi;
 use App\Http\Controllers\Api\Youtube;
 use App\Http\Controllers\Inpi\InpiRequest;
@@ -48,6 +50,12 @@ class ApisController extends Controller
     {
         $emails = new Emails($brand . '@hotmail.com');
         return response()->json($emails->exist());
+    }
+
+    public function twitter($brand)
+    {
+        $twitter = new Twitter($brand);
+        return response()->json($twitter->exist());
     }
 
 }
