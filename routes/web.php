@@ -14,4 +14,4 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/api/inpi', 'ApisController@inpi');
+Route::get('/api/inpi/{brand}', 'ApisController@inpi')->middleware('cors');
