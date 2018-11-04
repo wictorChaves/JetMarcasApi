@@ -17,9 +17,9 @@ class ApisController extends Controller
         $this->inpiRequest = $inpiRequest;
     }
 
-    public function inpi()
+    public function inpi($brand)
     {
-        return response()->json($this->inpiRequest->existBrand('teste'));
+        return response()->json($this->inpiRequest->existBrand($brand));
     }
 
 }
